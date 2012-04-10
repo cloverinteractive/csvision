@@ -2,10 +2,10 @@ require 'test_helper'
 
 class CSVisionTest < ActiveSupport::TestCase
   def setup
-    @hash_demo = ActiveSupport::OrderedHash.new
-    @hash_demo[:a] = 'a'
-    @hash_demo[:b] = 'b'
-    @hash_demo[:c] = 'c'
+    assert @hash_demo = ActiveSupport::OrderedHash.new
+    assert @hash_demo[:a] = 'a'
+    assert @hash_demo[:b] = 'b'
+    assert @hash_demo[:c] = 'c'
   end
 
   test "check plugin type" do
@@ -20,7 +20,7 @@ class CSVisionTest < ActiveSupport::TestCase
     assert_nil @hash_demo.cached_csv
     assert_match /[abc]\'/, @hash_demo.to_csv(:delimeter => "'")
 
-    @hash_demo[:d] = 'd'
+    assert @hash_demo[:d] = 'd'
     assert_not_equal @hash_demo.cached_csv, @hash_demo.to_csv
   end
 

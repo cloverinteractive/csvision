@@ -1,0 +1,4 @@
+test:
+  sqlite:
+    adapter: sqlite3
+    database: ":memory:"
