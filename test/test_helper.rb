@@ -1,0 +1,7 @@
+require 'rubygems'
+require 'bundler/setup'
+require 'csvision'
+require 'test/unit'
+require 'active_record'
+require 'active_support'
+require 'turn'
