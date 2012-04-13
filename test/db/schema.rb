@@ -8,4 +8,9 @@ ActiveRecord::Schema.define do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "users", :force => true do |t|
+    t.string  "nickname"
+    t.integer "points"
+  end
 end

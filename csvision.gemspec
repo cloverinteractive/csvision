@@ -19,7 +19,6 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'activerecord'
   gem.add_development_dependency 'activesupport'
   gem.add_development_dependency 'sqlite3'
-  gem.add_development_dependency 'mocha'
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'turn', '0.8.2'
 end

@@ -2,6 +2,10 @@ require "csvision/version"
 require "csvision/csv_helper"
 
 module CSVision
-  ::ActiveRecord::Base.send( :extend, CSVHelper ) if defined? ::ActiveRecord::Base
-  ::Hash.send( :include, CSVHelper::InstanceMethods )
+  def self.included(base)
+    base.extend CSVHelper
+  end
 end
+
+ActiveRecord::Base.send( :include, CSVision ) if defined? ActiveRecord::Base
+Hash.send( :include, CSVision::CSVHelper::InstanceMethods )

@@ -1,38 +1,43 @@
 module CSVision
-  def self.included(base)
-    base.extend CSVHelper
-  end
-
   module CSVHelper
     def add_csvision(options={})
       return if included_modules.include? InstanceMethods
-      cattr_accessor :csv_except, :csv_only, :csv_delimeter, :csv_separator, :csv_headers
+      cattr_accessor :csv_except, :csv_only, :csv_delimeter, :csv_separator, :csv_headers, :body
 
       self.csv_only       = options[:only]
       self.csv_except     = options[:except]
       self.csv_delimeter  = options[:delimeter] || '"'
       self.csv_separator  = options[:separator] || ','
+      self.csv_headers    = options[:csv_headers]
+      self.body           = options[:body]
 
       include InstanceMethods
       extend  ClassMethods
     end
 
     module ClassMethods
-      def to_csv(options={})
-        options[:headers] ||= true
-        headers, csv_array  = nil, []
+      def to_csv(options={ :headers => true, :batch_size => 100 })
+        options[:delimeter]   ||= csv_delimeter
+        options[:separator]   ||= csv_separator
+        options[:batch_size]  ||= 100
 
-        self.find_each(:batch_size => options[:batch_size]) do |object|
-          headers   ||= object.csvize( object.attributes.only( *csv_only ).keys,     options ) if csv_only    && !csv_only.empty?
-          headers   ||= object.csvize( object.attributes.except( *csv_except ).keys, options ) if csv_except  && !csv_except.empty?
+        unless self.count < 1
+          headers, csv_array  = nil, []
+          self.find_each :batch_size => options[:batch_size] do |object|
+            unless self.body
+              headers ||= object.csvize( object.attributes.only( *csv_only ).keys,     options ) if csv_only    && !csv_only.empty?
+              headers ||= object.csvize( object.attributes.except( *csv_except ).keys, options ) if csv_except  && !csv_except.empty?
 
-          csv_array << object.to_csv( options.merge(:headers => false) )
-        end
-        content = csv_array.join("\n")
+              csv_array << object.to_csv( options.merge(:headers => false) )
+            else
+              values    = self.body.call object
+              headers ||= object.csvize( self.csv_headers, options ) if self.csv_headers
+              csv_array << object.csvize( values, options )
+            end
+          end
 
-        if options[:headers]
-          headers + "\n" + content
-        else
+          content = csv_array.join("\n")
+          return headers + "\n" + content if options[:headers]
           content
         end
       end
@@ -61,7 +66,7 @@ module CSVision
         @csv += csvize(values, options)
       end
 
-      def csvize(values, options)
+      def csvize(values, options={})
         delimeter = options[:delimeter] || csv_delimeter
         separator = options[:separator] || csv_separator
 

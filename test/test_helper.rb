@@ -1,13 +1,11 @@
 require 'rubygems'
 require 'bundler/setup'
-require 'csvision'
 require 'test/unit'
 require 'active_record'
 require 'active_support'
 require 'active_support/dependencies'
+require 'csvision'
 require 'turn'
-
-include CSVision
 
 TEST_PATH = File.expand_path( File.join File.dirname( __FILE__ ) )
 config = YAML::load( IO.read( File.join TEST_PATH, 'config', 'database.yml' ) )['test']['sqlite']
@@ -18,4 +16,11 @@ ActiveSupport::Dependencies.autoload_paths.unshift File.join( TEST_PATH, 'app', 
 ActiveRecord::Base.silence do
   ActiveRecord::Migration.verbose = false
   load File.join( TEST_PATH, 'db','schema.rb' )
+end
+
+class ActiveSupport::TestCase
+  def teardown
+    User.delete_all
+    Product.delete_all
+  end
 end
