@@ -134,13 +134,13 @@ Will print:
 Anything that inherits from `Hash` will `respond_to? :to_csv` however if you want to use this in any other regular class make sure you do the following:
 
 1. Create a `Hash` attribute named `attributes`.
-2. You'll need to have a class `count` and `find_each` methods if you want support for setting the `body`.
+2. You'll need to have class `count` and `find_each` methods if you want support for setting the `body`.
 3. `include CSVision` in your class.
 
 ```ruby
 class SampleStack
   include CSVision
-  attr_accessor :attributes, :count
+  attr_accessor :attributes
 
   add_csvision :csv_headers => %w/price name/, :body => lambda { |s| [ s[:name], s[:price] ] }
 
