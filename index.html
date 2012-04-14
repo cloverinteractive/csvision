@@ -1,0 +1,270 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Csvision by cloverinteractive</title>
+    
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Csvision</h1>
+        <p>Convert Hash into CSV</p>
+        <p class="view"><a href="https://github.com/cloverinteractive/csvision">View the Project on GitHub <small>cloverinteractive/csvision</small></a></p>
+        <ul>
+          <li><a href="https://github.com/cloverinteractive/csvision/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/cloverinteractive/csvision/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/cloverinteractive/csvision">Fork On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>CSVision</h1>
+
+<p><a href="http://travis-ci.org/cloverinteractive/csvision"><img src="https://secure.travis-ci.org/cloverinteractive/csvision.png?branch=master" alt="Build Status"></a></p>
+
+<p>Convert a Hash into a CSV the easy way.</p>
+
+<h2>Installation</h2>
+
+<p>Add this line to your application's Gemfile:</p>
+
+<p><code>gem 'csvision'</code></p>
+
+<p>And then execute:</p>
+
+<p><code>bundle</code></p>
+
+<p>Or install it yourself as:</p>
+
+<p><code>gem install csvision</code></p>
+
+<h2>Usage</h2>
+
+<p>CSVision has no prerequisites other than ruby itself, which is pretty cool just include the <code>csvision</code> gem in your app and you'll be good to go.</p>
+
+<h3>Hash</h3>
+
+<p>CSVision adds to <code>Hash</code> the <code>to_csv</code> method, anything that inherits from <code>Hash</code> will inherit this method as well, you do not need to open <code>Hash</code> and include <code>CSVision</code> in it, just require the library in your code.</p>
+
+<div class="highlight">
+<pre><span class="nb">require</span> <span class="s1">'csvision'</span>
+<span class="n">sample</span> <span class="o">=</span> <span class="p">{</span> <span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">'foo'</span><span class="p">,</span> <span class="ss">:last_name</span> <span class="o">=&gt;</span> <span class="s1">'bar'</span><span class="p">,</span> <span class="ss">:age</span> <span class="o">=&gt;</span> <span class="mi">10</span> <span class="p">}</span>
+<span class="n">sample</span><span class="o">.</span><span class="n">to_csv</span> <span class="c1">#=&gt; "\"last_name\",\"name\",\"age\"\n\"bar\",\"foo\",\"10\""</span>
+</pre>
+</div>
+
+
+<h3>Rails</h3>
+
+<p>CSVision adds the following methods to Rails:</p>
+
+<ol>
+<li>
+<code>to_csv</code> at the model instance</li>
+<li>
+<code>to_csv</code> at the model class</li>
+<li>
+<code>add_csvision</code> at the model class</li>
+</ol><p>A rails model might look something like this:</p>
+
+<div class="highlight">
+<pre><span class="k">class</span> <span class="nc">Product</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">validates_presence_of</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:permalink</span><span class="p">,</span> <span class="ss">:description</span>
+  <span class="n">add_csvision</span> <span class="ss">:except</span> <span class="o">=&gt;</span> <span class="sx">%w/updated_at created_at/</span>
+<span class="k">end</span>
+</pre>
+</div>
+
+
+<p>CSVision lets you customize the way your CSV is formed, you can use any of the following options in the <code>add_csvision</code> method:</p>
+
+<ol>
+<li>
+<code>:only</code> to set only those parameters you wish to include.</li>
+<li>
+<code>:except</code> this does the opposite it excludes options from the list.</li>
+<li>
+<code>:delimeter</code> this set the field delimeter and it defaults to <code>"</code>
+</li>
+<li>
+<code>:separator</code> this set the field separator and it defults to <code>,</code>
+</li>
+</ol><p>That's good and all but, you never want to just convert a single object to csv but collections instead, so imagine this model instead:</p>
+
+<div class="highlight">
+<pre><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">add_csvision</span> <span class="ss">:csv_headers</span> <span class="o">=&gt;</span> <span class="sx">%w/street_cred nickname incognito/</span><span class="p">,</span> <span class="ss">:body</span> <span class="o">=&gt;</span> <span class="nb">lambda</span> <span class="p">{</span> <span class="o">|</span><span class="n">u</span><span class="o">|</span> <span class="o">[</span> <span class="n">u</span><span class="o">.</span><span class="n">street_cred</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">nickname</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">incognito</span> <span class="o">]</span> <span class="p">}</span>
+
+  <span class="n">scope</span> <span class="ss">:flunky</span><span class="p">,</span> <span class="n">where</span><span class="p">(</span> <span class="s1">'points &lt;= 5'</span> <span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">incognito</span>
+    <span class="n">nickname</span><span class="o">.</span><span class="n">reverse</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">street_cred</span>
+    <span class="n">points</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">+</span> <span class="p">(</span> <span class="n">nickname_cred</span> <span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span>
+  <span class="k">def</span> <span class="nf">nickname_cred</span>
+    <span class="n">nickname</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span> <span class="s1">'U'</span> <span class="o">*</span> <span class="n">nickname</span><span class="o">.</span><span class="n">length</span> <span class="p">)</span><span class="o">.</span><span class="n">sum</span> <span class="c1"># good nickname equals more street cred</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre>
+</div>
+
+
+<p>You can use the <code>:headers</code> option to set your header names, and the <code>:body</code> option to specify the methods or properties from the option you want
+called in your csv, this gives you flexibility to choose how your csv is formed and from what it is formed, so this is an example of how this works.</p>
+
+<div class="highlight">
+<pre><span class="mi">5</span><span class="o">.</span><span class="n">times</span> <span class="p">{</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span> <span class="no">User</span><span class="o">.</span><span class="n">create</span><span class="p">(</span> <span class="ss">:nickname</span> <span class="o">=&gt;</span> <span class="s2">"user</span><span class="si">#{</span> <span class="n">i</span> <span class="o">*</span> <span class="mi">3</span> <span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="ss">:points</span> <span class="o">=&gt;</span> <span class="n">i</span> <span class="o">*</span> <span class="mi">5</span> <span class="p">)</span> <span class="p">}</span>
+<span class="nb">puts</span> <span class="no">User</span><span class="o">.</span><span class="n">to_csv</span>
+</pre>
+</div>
+
+
+<p>this will print:</p>
+
+<pre><code>"street_cred","nickname","incognito"
+"495","user0","0resu"
+"998","user3","3resu"
+"1501","user6","6resu"
+"2004","user9","9resu"
+"2546","user12","21resu"
+</code></pre>
+
+<p>You can chain active record calls and even scopes in to your mix, so consider:</p>
+
+<div class="highlight">
+<pre><span class="mi">5</span><span class="o">.</span><span class="n">times</span> <span class="p">{</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span> <span class="no">User</span><span class="o">.</span><span class="n">create</span><span class="p">(</span> <span class="ss">:nickname</span> <span class="o">=&gt;</span> <span class="s2">"user</span><span class="si">#{</span> <span class="n">i</span> <span class="o">*</span> <span class="mi">3</span> <span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="ss">:points</span> <span class="o">=&gt;</span> <span class="n">i</span> <span class="o">*</span><span class="mi">5</span> <span class="p">)</span> <span class="p">}</span>
+<span class="nb">puts</span> <span class="no">User</span><span class="o">.</span><span class="n">flunky</span><span class="o">.</span><span class="n">to_csv</span>
+</pre>
+</div>
+
+
+<p>will print:</p>
+
+<pre><code>"street_cred","nickname","incognito"
+"495","user0","0resu"
+"998","user3","3resu"
+"1501","user6","6resu"
+</code></pre>
+
+<p>Lastly, with the exception of <code>:except</code> and <code>:only</code> which will be ignore because you're setting the body manually all other option work:</p>
+
+<div class="highlight">
+<pre><span class="mi">5</span><span class="o">.</span><span class="n">times</span> <span class="p">{</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span> <span class="no">User</span><span class="o">.</span><span class="n">create</span><span class="p">(</span> <span class="ss">:nickname</span> <span class="o">=&gt;</span> <span class="s2">"user</span><span class="si">#{</span> <span class="n">i</span> <span class="o">*</span> <span class="mi">3</span> <span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="ss">:points</span> <span class="o">=&gt;</span> <span class="n">i</span> <span class="o">*</span><span class="mi">5</span> <span class="p">)</span> <span class="p">}</span>
+<span class="nb">puts</span> <span class="no">User</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span> <span class="ss">:headers</span> <span class="o">=&gt;</span> <span class="kp">false</span> <span class="p">)</span>
+</pre>
+</div>
+
+
+<p>Will print:</p>
+
+<pre><code>"495","user0","0resu"
+"998","user3","3resu"
+"1501","user6","6resu"
+"2004","user9","9resu"
+"2546","user12","21resu"
+</code></pre>
+
+<h3>Outside of Rails</h3>
+
+<p>Anything that inherits from <code>Hash</code> will <code>respond_to? :to_csv</code> however if you want to use this in any other regular class make sure you do the following:</p>
+
+<ol>
+<li>Create a <code>Hash</code> attribute named <code>attributes</code>.</li>
+<li>You'll need to have class <code>count</code> and <code>find_each</code> methods if you want support for setting the <code>body</code>.</li>
+<li>
+<code>include CSVision</code> in your class.</li>
+</ol><div class="highlight">
+<pre><span class="k">class</span> <span class="nc">SampleStack</span>
+  <span class="kp">include</span> <span class="no">CSVision</span>
+  <span class="kp">attr_accessor</span> <span class="ss">:attributes</span>
+
+  <span class="n">add_csvision</span> <span class="ss">:csv_headers</span> <span class="o">=&gt;</span> <span class="sx">%w/price name/</span><span class="p">,</span> <span class="ss">:body</span> <span class="o">=&gt;</span> <span class="nb">lambda</span> <span class="p">{</span> <span class="o">|</span><span class="n">s</span><span class="o">|</span> <span class="o">[</span> <span class="n">s</span><span class="o">[</span><span class="ss">:name</span><span class="o">]</span><span class="p">,</span> <span class="n">s</span><span class="o">[</span><span class="ss">:price</span><span class="o">]</span> <span class="o">]</span> <span class="p">}</span>
+
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span> <span class="n">attributes</span><span class="o">=</span><span class="p">{},</span> <span class="n">inventory</span> <span class="o">=</span> <span class="o">[]</span> <span class="p">)</span>
+    <span class="vi">@attributes</span> <span class="o">=</span> <span class="n">attributes</span>
+    <span class="vc">@@inventory</span> <span class="o">=</span> <span class="n">inventory</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">count</span>
+    <span class="vc">@@inventory</span><span class="o">.</span><span class="n">size</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">find_each</span><span class="p">(</span> <span class="n">opts</span><span class="o">=</span><span class="p">{}</span> <span class="p">)</span>
+    <span class="vc">@@inventory</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">item</span><span class="o">|</span>
+      <span class="k">yield</span> <span class="n">item</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre>
+</div>
+
+
+<p>After wards imagine the following:</p>
+
+<div class="highlight">
+<pre><span class="n">sample_stack</span> <span class="o">=</span> <span class="no">SampleStack</span><span class="o">.</span><span class="n">new</span><span class="p">(</span> <span class="ss">:foo</span> <span class="o">=&gt;</span> <span class="s1">'foo'</span><span class="p">,</span> <span class="ss">:bar</span> <span class="o">=&gt;</span> <span class="s1">'bar'</span> <span class="p">)</span>
+<span class="nb">puts</span> <span class="n">sample_stack</span><span class="o">.</span><span class="n">to_csv</span>
+</pre>
+</div>
+
+
+<p>Will print:</p>
+
+<pre><code>"foo","bar"
+"foo","bar"
+</code></pre>
+
+<p>But more importantly <code>to_csv</code> at the class level will:</p>
+
+<div class="highlight">
+<pre><span class="n">inventory</span> <span class="o">=</span> <span class="o">[</span> <span class="p">{</span> <span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">'beer'</span><span class="p">,</span> <span class="ss">:price</span> <span class="o">=&gt;</span> <span class="mi">9</span> <span class="p">},</span> <span class="p">{</span> <span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">'milk'</span><span class="p">,</span> <span class="ss">:price</span> <span class="o">=&gt;</span> <span class="mi">5</span> <span class="p">},</span> <span class="p">{</span> <span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">'tuna'</span><span class="p">,</span> <span class="ss">:price</span> <span class="o">=&gt;</span> <span class="mi">3</span> <span class="p">}</span> <span class="o">]</span>
+<span class="n">sample_stack</span> <span class="o">=</span> <span class="no">SampleStack</span><span class="o">.</span><span class="n">new</span><span class="p">({</span> <span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">'groceries'</span><span class="p">},</span> <span class="n">inventory</span><span class="p">)</span>
+<span class="nb">puts</span> <span class="no">SampleStack</span><span class="o">.</span><span class="n">to_csv</span>
+</pre>
+</div>
+
+
+<p>Prints:</p>
+
+<pre><code>"price","name"
+"beer","9"
+"milk","5"
+"tuna","3"
+</code></pre>
+
+<h2>TODO:</h2>
+
+<ol>
+<li>Add support for other ORM's</li>
+<li>Rails 3.x responder.</li>
+</ol><h2>Contributing</h2>
+
+<ol>
+<li>Fork it</li>
+<li>Create your feature branch (<code>git checkout -b my-new-feature</code>)</li>
+<li>Commit your changes (<code>git commit -am 'Added some feature'</code>)</li>
+<li>Push to the branch (<code>git push origin my-new-feature</code>)</li>
+<li>Create new Pull Request</li>
+</ol>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/cloverinteractive">cloverinteractive</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
